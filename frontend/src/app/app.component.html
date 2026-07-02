@@ -1,0 +1,28 @@
+<div class="app-layout">
+  <!-- Navigation Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo">
+        <span class="logo-emoji">🚌</span>
+        <div class="logo-text">
+          <h1>TrackMyBus</h1>
+          <span class="sub">Live Tracking System POC</span>
+        </div>
+      </div>
+      
+      <nav class="nav-links">
+        <a routerLink="/tracker" routerLinkActive="active-link" class="nav-btn">
+          <span class="icon">📍</span> Live Map
+        </a>
+        <a routerLink="/driver" routerLinkActive="active-link" class="nav-btn">
+          <span class="icon">📲</span> Driver Console
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

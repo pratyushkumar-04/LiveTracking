@@ -1,0 +1,131 @@
+<div class="tracker-container">
+  <!-- Map Container -->
+  <div id="map" class="map-container"></div>
+
+  <!-- Telemetry overlay panel -->
+  <div class="dashboard-panel">
+    <div class="panel-header">
+      <div class="header-left">
+        <span class="pulse-icon" [class.connected]="wsConnected"></span>
+        <h2>Live Tracker</h2>
+      </div>
+      <div class="connection-status" [class.connected]="wsConnected">
+        {{ wsConnected ? 'LIVE FEED' : 'RECONNECTING...' }}
+      </div>
+    </div>
+
+    <div class="panel-body">
+      <div class="bus-details" *ngIf="latestLocation; else waitingTemplate">
+        <div class="bus-meta">
+          <div class="bus-badge">
+            <span class="icon"><i class="bi bi-bus-front"></i></span>
+            <span class="num">{{ latestLocation.bus.busNumber }}</span>
+          </div>
+          <div class="driver-name">
+            <span class="label">Driver</span>
+            <span class="value">{{ latestLocation.bus.driverName }}</span>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <span class="metric-label">Current Speed</span>
+            <span class="metric-value">{{ latestLocation.speed }} <span class="unit">km/h</span></span>
+          </div>
+          <div class="metric-card">
+            <span class="metric-label">Ping History</span>
+            <span class="metric-value">{{ historyCount }} <span class="unit">updates</span></span>
+          </div>
+        </div>
+
+        <div class="coordinate-list">
+          <div class="coordinate-item">
+            <span class="label">Latitude</span>
+            <span class="value font-mono">{{ latestLocation.latitude.toFixed(6) }}°</span>
+          </div>
+          <div class="coordinate-item">
+            <span class="label">Longitude</span>
+            <span class="value font-mono">{{ latestLocation.longitude.toFixed(6) }}°</span>
+          </div>
+          <div class="coordinate-item">
+            <span class="label">Last Broadcast</span>
+            <span class="value font-mono">{{ latestLocation.timestamp | date:'HH:mm:ss' }}</span>
+          </div>
+        </div>
+
+        <!-- Route Stops & Double ETA Overlay -->
+        <div class="destination-status-card" *ngIf="latestLocation.routeName" style="margin-top: 16px; padding: 14px; background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px;">
+          <div class="card-title" style="font-size: 13px; font-weight: 700; color: #3b82f6; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+            <i class="bi bi-map"></i> Route: <span>{{ latestLocation.routeName }}</span>
+          </div>
+
+          <!-- Next Stop Stats -->
+          <div class="stop-sub-card" *ngIf="latestLocation.nextStopName" style="background: rgba(15, 23, 42, 0.4); padding: 10px; border-radius: 6px; border-left: 3px solid #f43f5e; margin-bottom: 10px;">
+            <div style="font-size: 13px; font-weight: 600; color: #f8fafc; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+              <span><i class="bi bi-geo-alt-fill" style="color: #f43f5e;"></i> Next Stop</span>
+              <span style="color: #f43f5e; font-weight: 700;">{{ latestLocation.nextStopName }}</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; color: #94a3b8;">
+              <div>Dist: <strong style="color: #f8fafc;">{{ nextStopDistance !== null ? nextStopDistance : '--' }} km</strong></div>
+              <div>Est. ETA: <strong style="color: #f43f5e;">{{ nextStopEtaMinutes !== null ? nextStopEtaMinutes : '--' }} mins</strong></div>
+            </div>
+          </div>
+
+          <!-- Final Stop Stats -->
+          <div class="stop-sub-card" *ngIf="latestLocation.finalDestinationName" style="background: rgba(15, 23, 42, 0.4); padding: 10px; border-radius: 6px; border-left: 3px solid #10b981;">
+            <div style="font-size: 13px; font-weight: 600; color: #f8fafc; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+              <span><i class="bi bi-flag-fill" style="color: #10b981;"></i> Final Destination</span>
+              <span style="color: #10b981; font-weight: 700;">{{ latestLocation.finalDestinationName }}</span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; color: #94a3b8;">
+              <div>Remaining Dist: <strong style="color: #f8fafc;">{{ finalDistance !== null ? finalDistance : '--' }} km</strong></div>
+              <div>School Arrival: <strong style="color: #10b981;">{{ finalEtaMinutes !== null ? finalEtaMinutes : '--' }} mins</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #waitingTemplate>
+        <div class="waiting-card">
+          <div class="spinner"></div>
+          <p>Waiting for GPS coordinate broadcast from driver...</p>
+          <span class="subtext">Make sure the Driver Page is active and sharing.</span>
+        </div>
+      </ng-template>
+
+      <!-- Settings & Map Controls -->
+      <div class="controls-section">
+        <h3>Map Configuration</h3>
+        <div class="controls-grid">
+          <button 
+            class="control-btn" 
+            [class.active]="autoCenter" 
+            (click)="toggleAutoCenter()"
+            title="Auto-Center Map on Bus"
+            style="display: flex; align-items: center; justify-content: center; gap: 6px;"
+          >
+            <i class="bi bi-compass"></i> Auto-Center: {{ autoCenter ? 'ON' : 'OFF' }}
+          </button>
+          <button 
+            class="control-btn" 
+            [class.active]="showTrail" 
+            (click)="toggleShowTrail()"
+            title="Toggle breadcrumb trail"
+            style="display: flex; align-items: center; justify-content: center; gap: 6px;"
+          >
+            <i class="bi bi-bezier2"></i> Trail Path: {{ showTrail ? 'ON' : 'OFF' }}
+          </button>
+          <button 
+            class="control-btn action" 
+            [disabled]="!latestLocation"
+            (click)="triggerManualZoom()"
+            title="Zoom closer to current location"
+            style="display: flex; align-items: center; justify-content: center; gap: 6px;"
+          >
+            <i class="bi bi-search"></i> Focus Bus
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

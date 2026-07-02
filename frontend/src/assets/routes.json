@@ -1,0 +1,18 @@
+[
+  {
+    "name": "Route 101 - North Line",
+    "stops": [
+      { "name": "Stop A - Master Canteen", "lat": 20.2980, "lng": 85.8270 },
+      { "name": "Stop B - Jayadev Vihar", "lat": 20.2950, "lng": 85.8210 },
+      { "name": "School Campus", "lat": 20.3504665, "lng": 85.8065029 }
+    ]
+  },
+  {
+    "name": "Route 102 - South Line",
+    "stops": [
+      { "name": "Stop C - Patia", "lat": 20.3550, "lng": 85.8180 },
+      { "name": "Stop D - Kiit Square", "lat": 20.3510, "lng": 85.8120 },
+      { "name": "School Campus", "lat": 20.3504665, "lng": 85.8065029 }
+    ]
+  }
+]

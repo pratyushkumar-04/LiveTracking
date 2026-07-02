@@ -1,0 +1,124 @@
+<div class="driver-container">
+  <div class="driver-card">
+    <div class="card-header">
+      <div class="title-wrapper">
+        <span class="icon"><i class="bi bi-bus-front"></i></span>
+        <h2>Driver Console</h2>
+      </div>
+      <div class="status-badge" [class.active]="isSharing">
+        <span class="dot"></span>
+        {{ isSharing ? 'TRANSMITTING' : 'OFFLINE' }}
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="config-section">
+        <label for="busId">Bus / Route Identification</label>
+        <div class="input-group">
+          <span class="prefix"><i class="bi bi-hash"></i></span>
+          <input 
+            type="number" 
+            id="busId" 
+            [(ngModel)]="busId" 
+            [disabled]="isSharing"
+            min="1"
+            placeholder="Enter Bus ID"
+          />
+        </div>
+      </div>
+
+      <div class="config-section">
+        <label for="route">Active School Bus Route</label>
+        <div class="input-group">
+          <span class="prefix"><i class="bi bi-map"></i></span>
+          <select 
+            id="route" 
+            [(ngModel)]="selectedRoute"
+            [disabled]="isSharing"
+            style="flex: 1; background: transparent; border: none; padding: 12px 16px; color: #f8fafc; font-size: 15px; font-weight: 500; outline: none; cursor: pointer;"
+          >
+            <option *ngFor="let route of routes" [ngValue]="route" style="background-color: #1e293b; color: #f8fafc;">
+              {{ route.name }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Stop Navigator -->
+      <div class="config-section" *ngIf="isSharing" style="margin-top: 16px; padding: 14px; background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px;">
+        <label style="font-size: 11px; text-transform: uppercase; color: #94a3b8; display: block; margin-bottom: 8px;">
+          <i class="bi bi-geo-alt"></i> Stop Navigator (Index: {{ currentStopIndex + 1 }}/{{ selectedRoute.stops.length }})
+        </label>
+        <div style="font-size: 15px; font-weight: 700; color: #f8fafc; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+          <span style="color: #ef4444;"><i class="bi bi-flag-fill"></i> Target:</span> {{ selectedRoute.stops[currentStopIndex].name }}
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button 
+            (click)="advanceStop()" 
+            style="flex: 1; padding: 8px 12px; font-size: 12px; font-weight: 600; border-radius: 6px; border: none; background: #3b82f6; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;"
+            [disabled]="currentStopIndex >= selectedRoute.stops.length - 1"
+          >
+            <i class="bi bi-skip-forward-fill"></i> Next Stop
+          </button>
+          <button 
+            (click)="resetRoute()" 
+            style="padding: 8px 12px; font-size: 12px; font-weight: 600; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.15); background: transparent; color: #94a3b8; cursor: pointer; display: flex; align-items: center; gap: 6px;"
+          >
+            <i class="bi bi-arrow-counterclockwise"></i> Reset
+          </button>
+        </div>
+      </div>
+
+      <div class="control-section">
+        <button 
+          class="action-btn" 
+          [class.active]="isSharing" 
+          (click)="toggleSharing()"
+          style="display: flex; align-items: center; justify-content: center; gap: 8px;"
+        >
+          <i class="bi" [class.bi-stop-fill]="isSharing" [class.bi-play-fill]="!isSharing" style="font-size: 18px;"></i>
+          {{ isSharing ? 'Stop Location Sharing' : 'Start Location Sharing' }}
+        </button>
+      </div>
+
+      <div class="telemetry-grid" *ngIf="isSharing">
+        <div class="telemetry-card">
+          <div class="label">Latitude</div>
+          <div class="value">{{ currentLatitude !== null ? currentLatitude.toFixed(6) : '--' }}°</div>
+        </div>
+        <div class="telemetry-card">
+          <div class="label">Longitude</div>
+          <div class="value">{{ currentLongitude !== null ? currentLongitude.toFixed(6) : '--' }}°</div>
+        </div>
+        <div class="telemetry-card">
+          <div class="label">Speed</div>
+          <div class="value">{{ currentSpeed !== null ? currentSpeed : '--' }} <span class="unit">km/h</span></div>
+        </div>
+        <div class="telemetry-card">
+          <div class="label">Last Updated</div>
+          <div class="value">{{ lastUpdateTime ? (lastUpdateTime | date:'HH:mm:ss') : '--' }}</div>
+        </div>
+      </div>
+
+      <div class="error-banner" *ngIf="errorMessage">
+        <span class="error-icon"><i class="bi bi-exclamation-triangle-fill"></i></span>
+        <span class="error-text">{{ errorMessage }}</span>
+      </div>
+
+      <div class="log-console">
+        <div class="console-header">
+          <span>Activity Log</span>
+          <button class="clear-btn" (click)="clearLogs()">Clear</button>
+        </div>
+        <div class="console-body" #logScrollContainer>
+          <div class="log-line" *ngFor="let log of logMessages">
+            {{ log }}
+          </div>
+          <div class="log-placeholder" *ngIf="logMessages.length === 0">
+            No activity logs. Click start sharing to begin.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
