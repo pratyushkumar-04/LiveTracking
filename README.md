@@ -10,21 +10,21 @@ The **School Bus Live Tracking System** is a real-time web solution designed to 
 
 ## 2. Key System Features
 
-* 📍 **Active Route Tracking**
+*  **Active Route Tracking**
   * Groups stops into logical sequences (Routes).
   * Drivers and parents see the exact bus location relative to each upcoming stop.
-* ⏱️ **Dual-ETA Overlay Dashboard**
+*  **Dual-ETA Overlay Dashboard**
   * Displays time and distance remaining to the very next stop on the route.
   * Displays time and distance remaining to the final school destination.
-* 🎯 **Automatic Stop Detection**
+*  **Automatic Stop Detection**
   * Tracks the bus’s proximity using geofencing.
   * Automatically logs arrival when the bus enters within 150 meters of an upcoming stop.
   * Shifts the tracker's focus to the next sequential stop automatically.
-* 💾 **Resource-Saving Persistence**
+*  **Resource-Saving Persistence**
   * Operates on a "last-known-location" strategy to keep database costs and server footprints minimal.
   * Saves only the single latest position in the database.
   * Draws the historical trail dynamically in the parent's browser to keep the database light.
-* 🔒 **Privacy-First Sharing**
+*  **Privacy-First Sharing**
   * GPS tracking activates only when the driver explicitly starts a trip.
   * Clears active markers and displays an offline template immediately when the route finishes.
 
@@ -110,7 +110,7 @@ Schools can add, edit, or remove routes and stops in minutes without touching a 
 ## 6. Project Demo Links
 
 ### For Tracking (Parents, Students)
-👉 [Tracker Console](https://schoolbustrack.netlify.app/tracker)
+ [Tracker Console](https://schoolbustrack.netlify.app/tracker)
 
 ### For Drivers to start Trip
-👉 [Driver Start Trip Console](https://schoolbustrack.netlify.app/driver)
+ [Driver Start Trip Console](https://schoolbustrack.netlify.app/driver)
